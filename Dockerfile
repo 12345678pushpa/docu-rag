@@ -13,8 +13,8 @@ RUN useradd -m -u 1000 appuser
 WORKDIR /app
 
 # Copy requirements and install Python packages
-COPY requirements-railway.txt .
-RUN pip install --no-cache-dir -r requirements-railway.txt
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY --chown=appuser:appuser . .
