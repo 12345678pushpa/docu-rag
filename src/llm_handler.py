@@ -389,3 +389,5 @@ Please provide a helpful and accurate answer based on the context provided."""
         self.cache_max_size = 100  # Smaller cache for interactive use
         print("⚡ LLM optimized for interactive use")
         
+# Alias for backward compatibility
+LLMHandler = OptimizedLLMHandler
