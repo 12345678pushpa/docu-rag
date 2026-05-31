@@ -1,7 +1,6 @@
 langchain
 langchain-community
 langchain-nvidia-ai-endpoints
-langchain-text-splitters
 chromadb
 pypdf
 python-dotenv
