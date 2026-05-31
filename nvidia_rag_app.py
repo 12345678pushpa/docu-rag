@@ -10,14 +10,14 @@ from pypdf import PdfReader
 
 load_dotenv()
 
-st.set_page_config(page_title="NVIDIA RAG System", layout="wide")
+st.set_page_config(page_title="RAG System", layout="wide")
 
 if not os.environ.get("NVIDIA_API_KEY", "").startswith("nvapi-"):
     st.error("⚠️ Invalid NVIDIA API Key. Check your .env file.")
     st.stop()
 
-st.title("🚀 NVIDIA NIM - Document Q&A System")
-st.markdown("Using ChromaDB for vector storage")
+st.title("Document Q&A System")
+
 
 @st.cache_resource
 def get_llm():
@@ -95,7 +95,7 @@ with st.sidebar:
         else:
             st.warning("Select files first")
 
-st.header("💬 Ask Questions")
+st.header("Ask Questions")
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
