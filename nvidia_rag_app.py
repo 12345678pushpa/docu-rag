@@ -3,7 +3,7 @@ import os
 import tempfile
 from dotenv import load_dotenv
 from langchain_community.document_loaders import TextLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import Chroma
 from langchain_nvidia_ai_endpoints import NVIDIAEmbeddings, ChatNVIDIA
 from pypdf import PdfReader
@@ -28,7 +28,6 @@ def get_embeddings():
     return NVIDIAEmbeddings(model="nvidia/nv-embedqa-e5-v5")
 
 def extract_text_from_pdf(file_path):
-    """Extract text from PDF file with better error handling"""
     try:
         reader = PdfReader(file_path)
         text = ""
@@ -41,13 +40,11 @@ def extract_text_from_pdf(file_path):
             except Exception as e:
                 st.warning(f"Could not extract text from page {page_num + 1}: {str(e)}")
                 continue
-        
         if text.strip():
             return text
         else:
-            st.error("No text could be extracted from this PDF. It might be scanned or image-based.")
+            st.error("No text could be extracted from this PDF.")
             return None
-            
     except Exception as e:
         st.error(f"Error reading PDF: {str(e)}")
         return None
@@ -74,7 +71,6 @@ with st.sidebar:
                         with open(path, 'r', encoding='utf-8') as txt_file:
                             text = txt_file.read()
                             all_texts.append({"content": text, "source": f.name})
-                    
                     os.unlink(path)
                 
                 if all_texts:
@@ -88,13 +84,12 @@ with st.sidebar:
                     chunks = splitter.split_documents(documents)
                     
                     vectorstore = Chroma.from_documents(
-                        chunks, 
-                        get_embeddings(), 
+                        chunks,
+                        get_embeddings(),
                         persist_directory="./chroma_db"
                     )
                     st.session_state.vectorstore = vectorstore
                     st.success(f"✅ Processed {len(uploaded_files)} files into {len(chunks)} chunks")
-                    st.info("💡 ChromaDB is now storing your document vectors")
                 else:
                     st.error("No text could be extracted")
         else:
@@ -116,22 +111,19 @@ if prompt := st.chat_input("Ask about your documents..."):
     
     with st.chat_message("assistant"):
         if "vectorstore" in st.session_state:
-            with st.spinner("Searching with ChromaDB..."):
+            with st.spinner("Searching..."):
                 docs = st.session_state.vectorstore.similarity_search(prompt, k=3)
                 context = "\n\n".join([d.page_content for d in docs])
                 result = get_llm().invoke(
                     f"Context:\n{context}\n\nQuestion: {prompt}\n\nAnswer based only on context:"
                 )
-                # ✅ Extract clean text from ChatNVIDIA response
                 response = result.content if hasattr(result, 'content') else str(result)
-
                 with st.expander("📚 Sources"):
                     for i, d in enumerate(docs):
                         source = d.metadata.get("source", "Unknown")
                         st.write(f"**{i+1} ({source}):** {d.page_content[:300]}...")
         else:
-            response = "Please upload and process documents first using the sidebar."
-
-        # ✅ response is now always a plain string
+            response = "Please upload and process documents first."
+        
         st.markdown(response)
         st.session_state.messages.append({"role": "assistant", "content": response})
