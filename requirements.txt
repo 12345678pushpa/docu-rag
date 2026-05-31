@@ -1,10 +1,8 @@
-﻿langchain==0.3.27
+langchain==0.3.27
 langchain-community==0.3.29
-langchain-ollama==0.3.8
-chromadb==1.1.0
+langchain-nvidia-ai-endpoints==0.3.9
+langchain-core==0.3.28
+chromadb==0.5.0
 pypdf==6.0.0
-docx2txt==0.9
 python-dotenv==1.1.1
-streamlit==1.29.0
-sentence-transformers
-transformers
+streamlit==1.45.1
